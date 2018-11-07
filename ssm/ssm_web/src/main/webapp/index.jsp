@@ -12,5 +12,6 @@
 </head>
 <body>
 <h2>helloWorld!!!</h2>
+<a href="${pageContext.request.contextPath}/product/findAll">gogogo</a>
 </body>
 </html>
