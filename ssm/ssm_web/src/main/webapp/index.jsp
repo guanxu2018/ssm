@@ -11,7 +11,6 @@
     <title>Title</title>
 </head>
 <body>
-<h2>helloWorld!!!</h2>
-<a href="${pageContext.request.contextPath}/product/findAll">gogogo</a>
+<jsp:forward page="pages/main.jsp"/>
 </body>
 </html>

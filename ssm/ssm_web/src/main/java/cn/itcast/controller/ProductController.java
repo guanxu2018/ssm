@@ -24,4 +24,10 @@ public class ProductController {
         mv.setViewName("product-list");
         return mv;
     }
+    @RequestMapping("/saveProduct")
+    public String saveProduct(Product product){
+        System.out.println(product);
+        productService.saveProduct(product);
+        return "redirect:findAll";
+    }
 }

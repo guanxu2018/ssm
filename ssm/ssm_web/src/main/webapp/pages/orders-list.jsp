@@ -2,7 +2,7 @@
   Created by IntelliJ IDEA.
   User: Mr
   Date: 2018/11/7
-  Time: 12:17
+  Time: 21:14
   To change this template use File | Settings | File Templates.
 --%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
@@ -17,7 +17,7 @@
 
 
 
-    <title>产品管理</title>
+    <title>订单管理</title>
     <meta name="description" content="AdminLTE2定制版">
     <meta name="keywords" content="AdminLTE2定制版">
 
@@ -132,11 +132,11 @@
 <div class="wrapper">
 
     <!-- 页面头部 -->
-  <jsp:include page="header.jsp"/>
+    <jsp:include page="header.jsp"/>
     <!-- 页面头部 /-->
 
     <!-- 导航侧栏 -->
-   <jsp:include page="aside.jsp"/>
+    <jsp:include page="aside.jsp"/>
     <!-- 导航侧栏 /-->
 
     <!-- 内容区域 -->
@@ -153,7 +153,7 @@
             </h1>
             <ol class="breadcrumb">
                 <li><a href="#"><i class="fa fa-dashboard"></i> 首页</a></li>
-                <li><a href="#">产品管理</a></li>
+                <li><a href="#">订单管理</a></li>
                 <li class="active">数据列表</li>
             </ol>
         </section>
@@ -201,34 +201,30 @@
                                     <input id="selall" type="checkbox" class="icheckbox_square-blue">
                                 </th>
                                 <th class="sorting_asc text-center">ID</th>
-                                <th class="sorting_desc text-center">编号</th>
+                                <th class="sorting_desc text-center">订单编号</th>
                                 <th class="sorting_asc sorting_asc_disabled text-center">产品名称</th>
-                                <th class="sorting_desc sorting_desc_disabled text-center">出发城市</th>
-                                <th class="sorting text-center">出发时间</th>
-                                <th class="sorting text-center">产品价格</th>
-                                <th class="sorting text-center">产品描述</th>
-                                <th class="text-center sorting text-center">状态</th>
+                                <th class="sorting_desc sorting_desc_disabled text-center">金额</th>
+                                <th class="sorting text-center">下单时间</th>
+                                <th class="text-center sorting text-center"> 订单状态</th>
                                 <th class="text-center text-center">操作</th>
                             </tr>
                             </thead>
                             <tbody>
-                            <c:forEach items="${productList}" var="product" varStatus="status">
-                            <tr>
-                                <td class="text-center"><input name="ids" type="checkbox"></td>
-                                <td id="${product.id}" class="text-center">${status.index+1}</td>
-                                <td class="text-center">${product.productNum}</td>
-                                <td class="text-center">${product.productName}</td>
-                                <td class="text-center">${product.cityName}</td>
-                                <td class="text-center">${product.departureTimeStr}</td>
-                                <td class="text-center">${product.productPrice}</td>
-                                <td class="text-center">${product.productDesc}</td>
-                                <td class="text-center">${product.productStatusStr}</td>
-                                <td class="text-center">
-                                    <button type="button" class="btn bg-olive btn-xs">订单</button>
-                                    <button type="button" class="btn bg-olive btn-xs">详情</button>
-                                    <button type="button" class="btn bg-olive btn-xs">编辑</button>
-                                </td>
-                            </tr>
+                            <c:forEach items="${pageInfo.list}" var="orders" varStatus="status">
+                                <tr>
+                                    <td class="text-center"><input name="ids" type="checkbox"></td>
+                                    <td value="${orders.id}" class="text-center">${pageInfo.startRow+status.index}</td>
+                                    <td class="text-center">${orders.orderNum}</td>
+                                    <td class="text-center">${orders.product.productName}</td>
+                                    <td class="text-center">${orders.product.productPrice}</td>
+                                    <td class="text-center">${orders.orderTimeStr}</td>
+                                    <td class="text-center">${orders.orderStatusStr}</td>
+                                    <td class="text-center">
+                                        <button type="button" class="btn bg-olive btn-xs">订单</button>
+                                        <button type="button" class="btn bg-olive btn-xs" onclick="location.href='${pageContext.request.contextPath}/orders/findById?id=${orders.id}'">详情</button>
+                                        <button type="button" class="btn bg-olive btn-xs">编辑</button>
+                                    </td>
+                                </tr>
                             </c:forEach>
                             </tbody>
                             <!--
@@ -256,13 +252,16 @@
                 <div class="box-footer">
                     <div class="pull-left">
                         <div class="form-group form-inline">
-                            总共2 页，共14 条数据。 每页
-                            <select class="form-control">
-                                <option>1</option>
-                                <option>2</option>
-                                <option>3</option>
-                                <option>4</option>
-                                <option>5</option>
+                            总共${pageInfo.pages} 页，共${pageInfo.total} 条数据。 每页
+                            <select class="form-control" id="changePageSize" onchange="changePageSize()">
+                                <c:forEach begin="1" end="5" var="i">
+                                    <c:if test="${pageInfo.pageSize==i}">
+                                        <option selected>${i}</option>
+                                    </c:if>
+                                    <c:if test="${pageInfo.pageSize!=i}">
+                                        <option>${i}</option>
+                                    </c:if>
+                                </c:forEach>
                             </select> 条
                         </div>
                     </div>
@@ -270,17 +269,48 @@
                     <div class="box-tools pull-right">
                         <ul class="pagination">
                             <li>
-                                <a href="#" aria-label="Previous">首页</a>
+                                <!--判断是否有第一页-->
+                                <c:if test="${pageInfo.isFirstPage}">
+                                <a href="javascript:void(0);" aria-label="Previous">首页</a>
+                                </c:if>
+                                <c:if test="${!pageInfo.isFirstPage}">
+                                    <a href="${pageContext.request.contextPath}/orders/findAll?pageNum=1&pageSize=${pageInfo.pageSize}" aria-label="Previous">首页</a>
+                                </c:if>
+
                             </li>
-                            <li><a href="#">上一页</a></li>
-                            <li><a href="#">1</a></li>
-                            <li><a href="#">2</a></li>
-                            <li><a href="#">3</a></li>
-                            <li><a href="#">4</a></li>
-                            <li><a href="#">5</a></li>
-                            <li><a href="#">下一页</a></li>
                             <li>
-                                <a href="#" aria-label="Next">尾页</a>
+                                <!--判断是否有上一页-->
+                                <c:if test="${!pageInfo.hasPreviousPage}">
+                                <a href="javascript:void(0);">上一页</a></li>
+                                </c:if>
+                                <c:if test="${pageInfo.hasPreviousPage}">
+                                    <a href="${pageContext.request.contextPath}/orders/findAll?pageNum=${pageInfo.pageNum-1}&pageSize=${pageInfo.pageSize}">上一页</a></li>
+                                </c:if>
+
+                            <c:forEach begin="${pageInfo.navigateFirstPage}" end="${pageInfo.navigateLastPage}" var="i">
+                                <c:if test="${pageInfo.pageNum==i}">
+                                    <li class="active"><a href="javascript:void(0);">${i}</a></li>
+                                </c:if>
+                                <c:if test="${pageInfo.pageNum!=i}">
+                                    <li><a href="${pageContext.request.contextPath}/orders/findAll?pageNum=${i}&pageSize=${pageInfo.pageSize}">${i}</a></li>
+                                </c:if>
+                            </c:forEach>
+                            <li>
+                                <!--判断是否有下一页-->
+                                <c:if test="${!pageInfo.hasNextPage}">
+                                <a href="javascript:void(0);">下一页</a></li>
+                                </c:if>
+                                <c:if test="${pageInfo.hasNextPage}">
+                                    <a href="${pageContext.request.contextPath}/orders/findAll?pageNum=${pageInfo.pageNum+1}&pageSize=${pageInfo.pageSize}">下一页</a></li>
+                                </c:if>
+                            <li>
+                                <!--判断是否有最后一页-->
+                                <c:if test="${pageInfo.isLastPage}">
+                                <a href="javascript:void(0);" aria-label="Next">尾页</a>
+                                </c:if>
+                                <c:if test="${!pageInfo.isLastPage}">
+                                    <a href="${pageContext.request.contextPath}/orders/findAll?pageNum=${pageInfo.pages}&pageSize=${pageInfo.pageSize}" aria-label="Next">尾页</a>
+                                </c:if>
                             </li>
                         </ul>
                     </div>
@@ -357,6 +387,14 @@
 <script src="${pageContext.request.contextPath}/plugins/bootstrap-datetimepicker/bootstrap-datetimepicker.js"></script>
 <script src="${pageContext.request.contextPath}/plugins/bootstrap-datetimepicker/locales/bootstrap-datetimepicker.zh-CN.js"></script>
 <script>
+    function changePageSize() {
+        //获取下拉框的值
+        var pageSize = $("#changePageSize").val();
+
+        //向服务器发送请求，改变没页显示条数
+        location.href = "${pageContext.request.contextPath}/orders/findAll?pageNum=1&pageSize="
+            + pageSize;
+    }
     $(document).ready(function() {
         // 选择框
         $(".select2").select2();
