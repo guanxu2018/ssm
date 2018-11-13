@@ -58,7 +58,7 @@
         <!--配置通知-->
         <tx:advice id="txAdvice" transaction-manager="transactionManager">
             <tx:attributes>
-                <tx:method name="*" propagation="REQUIRED"/>
+                <tx:method name="*" isolation="DEFAULT" propagation="REQUIRED" read-only="false"/>
             </tx:attributes>
         </tx:advice>
         <!--配置aop切面-->

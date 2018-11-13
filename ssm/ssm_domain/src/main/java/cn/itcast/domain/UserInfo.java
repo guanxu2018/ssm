@@ -9,7 +9,7 @@ public class UserInfo {
     private String password;
     private String phoneNum;
     private int status;
-    private String statusStr;
+    private String statusStr;//状态0 未开启 1 开启
 
     private List<Roles> roles;
 
@@ -58,6 +58,16 @@ public class UserInfo {
     }
 
     public void setStatus(int status) {
+        //状态0 未开启 1 开启
+        if(status>=0&&status<=1){
+            if(status==0){
+                statusStr="关闭";
+            }
+            if(status==1){
+                statusStr="开启";
+            }
+
+        }
         this.status = status;
     }
 
